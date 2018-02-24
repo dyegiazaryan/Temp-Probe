@@ -60,21 +60,33 @@ void setup() {
     dataFile.close();
     }
   
-  Serial.println(current_file);  
+  Serial.println(current_file); 
 }
+
+unsigned long millis1;
+unsigned long millis2;
+unsigned long micros1;
+unsigned long micros2;
+unsigned long waitmillis;
+unsigned long waitmicros;
+unsigned long millis0=millis();
+unsigned long micros0=micros();
 
 void loop(){
   /* Open and write
      Writes pressureString to the sdcard log.txt file, closes the file after every write.
   */  
+  millis1=millis()-millis0;
+  micros1=micros()-micros0;
   sensors.requestTemperatures();
   float t1 = sensors.getTempFByIndex(0);
   float t2 = sensors.getTempFByIndex(1);
   float t3 = sensors.getTempFByIndex(2);
-  delay(1000);
-  Serial.print("\nT1: ");
+  
+  Serial.print("\nTime: ");
+  Serial.println(millis1);
+  Serial.print("T1: ");
   Serial.println(sensors.getTempFByIndex(0));
-//  Serial.println(" ");
   Serial.print("T2: ");
   Serial.println(sensors.getTempFByIndex(1));
 
@@ -86,7 +98,7 @@ void loop(){
   File dataFile = SD.open(current_file, FILE_WRITE);
  
   if (dataFile){
-    dataFile.print(millis());
+    dataFile.print(millis1);
     dataFile.print(',');
     dataFile.print(t1, 4);
     dataFile.print(',');
@@ -95,10 +107,19 @@ void loop(){
     dataFile.println(t3, 4);
     dataFile.close();
   }
-  
   else {
     Serial.println("error opening datafile");
   }
+  millis2=millis()-millis0;
+  waitmillis=998-(millis2-millis1);
+  delay(waitmillis);
+  micros2=micros()-micros0;
+  waitmicros=1000000-(micros2-micros1);
+  Serial.print("Delay milli: ");
+  Serial.println(waitmillis);
+  Serial.print("Delay micro: ");
+  Serial.println(waitmicros);
+  delayMicroseconds(waitmicros);
 }
 
 int countFiles(File f){
